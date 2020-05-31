@@ -25,7 +25,7 @@ console.log(gd)
 
 
 let deal = (cards) => {
-    if(queue.length < 0){
+    for(p in queue){
 
     }
 }
@@ -55,6 +55,11 @@ bot.on("message", async (message) => {
     if(cmd == command('join')){
         queue.includes(message.member.user.tag) ? null : queue.push(message.member.user.tag)
         message.channel.send("You have joined the game queue.")
+    }
+
+    if(cmd == command('deal')){
+        let deal = deck.deal(gd, queue)
+        message.channel.send(deal[0])
     }
 
 })
