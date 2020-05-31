@@ -1,8 +1,11 @@
 const random = require('random')
 const config = require('./botconfig.json')
+const sift = require('sift')
+const discord = require('discord.js')
+var bot = new discord.Client();
 class Deck {
     constructor(){
-        this.random = random;
+        this.bot = bot;
     }
     generateDeck(gd){
         let gameDeck = [];
@@ -22,20 +25,21 @@ class Deck {
         return gameDeck;
     }
     deal(deck, players){
-        let currentDeck = deck;
         let deltcards = [];
-        for(let p in players){
-            console.log("p",p)
-            let cards = []
-            for(let c = 0; c <= config.cardsToDeal; c++){
-                console.log("c",c)
-                let card = this.random.int(0, currentDeck.length)
-                cards.push({player: p, card:currentDeck[card].card, property:currentDeck[card].property})
+        players.forEach((p, i) => {
+            var pCards = [];
+            for(let c = 0; c < config.cardsToDeal; c++){
+                let rnd = random.int(0, deck.length);
+                pCards.push({
+                    player: p,
+                    card: deck[rnd].card,
+                    property: deck[rnd].property
+                })
+                deck.splice(rnd, 1)
             }
-            deltcards.push({player:p,cards})
-            console.log(deltcards)
-        }
-        return deltcards;
+            deltcards.push({player:p, cards:pCards})
+        })
+        return {deltcards, deck};
     }
 }
 

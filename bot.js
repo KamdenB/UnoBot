@@ -5,9 +5,9 @@ const random = require('random');
 const gameDeck = require('./deck')
 
 const Deck = require('./deck.class');
-let deck = new Deck;
 
 let bot = new Discord.Client();
+let deck = new Deck;
 
 let prefix = botConfig.prefix;
 
@@ -19,7 +19,7 @@ let queue = []
 ///
 
 let gd = deck.generateDeck(gameDeck);
-console.log(gd)
+// console.log(gd)
 
 // console.log(deck.generateDeck(deck))
 
@@ -53,15 +53,24 @@ bot.on("message", async (message) => {
     }
 
     if(cmd == command('join')){
-        queue.includes(message.member.user.tag) ? null : queue.push(message.member.user.tag)
+        queue.includes(message.member.user.tag) ? null : queue.push(message.member.user.id)
         message.channel.send("You have joined the game queue.")
     }
 
     if(cmd == command('deal')){
+        console.log(gd)
         let deal = deck.deal(gd, queue)
-        message.channel.send(deal[0])
+        gd = deal.deck;
+        deal.deltcards.forEach((p) => {
+            bot.users.fetch(p.player).then(player => {
+                player.send("You've been delt: ")
+                p.cards.forEach(c => {
+                    player.send(`${c.card} ${c.property}`)
+                })
+            })
+        })
+        message.channel.send("Players have been delt")
     }
-
 })
 
 bot.login(token.token)
