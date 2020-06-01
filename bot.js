@@ -4,31 +4,23 @@ const Discord = require('discord.js');
 const random = require('random');
 const gameDeck = require('./deck')
 
+/* Custom classes*/
 const Deck = require('./deck.class');
 
 let bot = new Discord.Client();
 let deck = new Deck;
 
+/* Bot settings, etc */
 let prefix = botConfig.prefix;
+let currentGames;
 
+/* Format command */
 let command = (cmd) => {return `${prefix}${cmd}`; }
 
-///
-
-let queue = []
-///
-
+/* Temporary Until Mongo is setup*/
+let queue = [];
 let gd = deck.generateDeck(gameDeck);
-// console.log(gd)
-
-// console.log(deck.generateDeck(deck))
-
-
-let deal = (cards) => {
-    for(p in queue){
-
-    }
-}
+/***/
 
 bot.on("ready", async () => {
     console.log(`${bot.user.username} is online!`);
@@ -36,7 +28,6 @@ bot.on("ready", async () => {
 
 bot.on("message", async (message) => {
     let cmd = message.content.split(" ")[0].toLowerCase();
-    if(message.channel.type === "dm") return;
 
     if(cmd == command('queue')){
         let queueEmbed = new Discord.MessageEmbed()
@@ -44,19 +35,30 @@ bot.on("message", async (message) => {
             .setTitle('Queue')
             .setDescription(`${queue.length}/4 In Queue`)
         if(queue.length >= 1){
-            queue.forEach((e, i) => {
-                queueEmbed.addField(`Player ${i+1}`, e, true)
+            queue.forEach((q, i) => {
+                queueEmbed.addField(`Player ${i+1}`, q.name, true)
             });
         }
-        let q = queue.length == 0 ? '0/4' : queueEmbed
-        message.channel.send(q)
+        message.channel.send(queue.length == 0 ? '0/4' : queueEmbed)
     }
 
+    /* Join game queue */
     if(cmd == command('join')){
-        queue.includes(message.member.user.tag) ? null : queue.push(message.member.user.id)
+        queue.includes(message.member.user.tag) ? null : queue.push({id:message.member.user.id, name:message.member.user.username})
         message.channel.send("You have joined the game queue.")
     }
 
+    /* Draw card from deck */
+    if(cmd == command('draw')){
+        if(message.channel.type === "dm"){
+            let draw = deck.draw(gd, message.author.tag)
+            message.channel.send(`${draw.card} ${draw.property} ${draw.player}`)
+        } else {
+            message.channel.send("This command can only be used during the game!");
+        }
+    }
+
+    /* Deal cards to all players. This will automatically happen once all players are "ready" */
     if(cmd == command('deal')){
         console.log(gd)
         let deal = deck.deal(gd, queue)
@@ -65,7 +67,7 @@ bot.on("message", async (message) => {
             bot.users.fetch(p.player).then(player => {
                 player.send("You've been delt: ")
                 p.cards.forEach(c => {
-                    player.send(`${c.card} ${c.property}`)
+                    player.send(`${c.c} ${c.property}`)
                 })
             })
         })

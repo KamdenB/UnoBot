@@ -24,8 +24,8 @@ module.exports = {
     wilds:{
         max: 3,
         cards: [
-            "wild",
-            "wild-plus-4"
+            "normal",
+            "plus-4"
         ]
     }
 }
