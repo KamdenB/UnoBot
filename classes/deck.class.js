@@ -1,7 +1,5 @@
 const random = require('random')
-const config = require('./botconfig.json')
-const sift = require('sift')
-const discord = require('discord.js')
+const config = require('../botconfig.json')
 
 class Deck {
 
