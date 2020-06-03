@@ -1,10 +1,11 @@
 const random = require('random')
 const config = require('../botconfig.json')
+const deckTemplate = require('../deck.template')
 
 class Deck {
-
     /* Generates game deck based off the deck definitions from deck.js */
-    generateDeck(gd){
+    generateDeck(){
+        let gd = deckTemplate;
         let gameDeck = [];
         for(let c in gd.colors) {
             for(let n in gd.numbers){
@@ -34,15 +35,16 @@ class Deck {
         players.forEach(p => {
             var pCards = [];
             for(let c = 0; c < config.cardsToDeal; c++){
-                let rnd = random.int(0, deck.length);
+                let rnd = Math.floor(Math.random() * deck.length)
+                console.log(rnd)
                 pCards.push({
-                    player: p.name,
-                    c: deck[rnd].card,
+                    player: p.author.username,
+                    card: deck[rnd].card,
                     property: deck[rnd].property
                 })
-                deck.splice(rnd, 1)
+                deck = deck.splice(rnd, 1)
             }
-            deltcards.push({player:p.id, cards:pCards})
+            deltcards.push({player:p.author.id, cards:pCards})
         })
         return {deltcards, deck};
     }
