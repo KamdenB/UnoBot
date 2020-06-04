@@ -6,15 +6,21 @@ const queueSchema = new Schema({
         type: String,
         required: true
     },
-    user: {
-        username: {
-            type: String,
-            required: true
-        },
-        id: {
-            type: Number,
-            required: true
-        }
+    serverName: {
+        type: String,
+        required: true,
+    },
+    username: {
+        type: String,
+        required: true
+    },
+    id: {
+        type: Number,
+        required: true
+    },
+    ready: {
+        type: Boolean,
+        required: true
     }
 })
 
