@@ -63,17 +63,19 @@ client.on("message", async (message) => {
 
     /* Join game queue */
     if(cmd == command('join')){
-        queueSchema.find({server:message.guild.id.toString()}, 'username', (err, res) => {
+        queueSchema.find({
+            server:message.guild.id.toString()
+        }, 'username', (err, res) => {
             res = res.filter(x => x.username == message.author.username);
             if(res.length > 0){
                 message.channel.send("You are already in queue!") 
             } else {
                 new queueSchema(
                     {
-                        server:message.guild.id, 
+                        server: message.guild.id, 
                         serverName: message.guild.name,
-                        username:message.author.username, 
-                        id:message.member.id,
+                        username: message.author.username, 
+                        id: message.member.id,
                         ready: false
                     }
                 )
@@ -92,11 +94,14 @@ client.on("message", async (message) => {
     }
 
     if(cmd == command('ready')){
-        queueSchema.find({username:message.author.username, server:message.guild.id}, (err, res) => {
+        queueSchema.find({
+            username:message.author.username, 
+            server:message.guild.id
+        }, (err, res) => {
             if(res.length > 0){
                 queueSchema.findByIdAndUpdate(res[0])
                 .then((q) => {
-                    q.ready = !q.ready
+                    q.ready = !q.nready
                     q.save()
                     .then(() => message.channel.send(`You are ${!q.ready ? 'no longer' : 'now'} ready!`))
                     .catch(e => console.log(e))
@@ -114,9 +119,11 @@ client.on("message", async (message) => {
     }
 
     if(message.author.id == "348459284645937153"){
+
         if(cmd == command('stats')){
             return message.channel.send(`Server count: ${client.guilds.cache.size}`)
         }
+
         if(cmd == command('queues')){
             queueSchema.find().then(queues => {
                 queues = [...new Map(queues.map(q => [q.server, q]).values())]
@@ -124,19 +131,23 @@ client.on("message", async (message) => {
                 .setColor("#ff0000")
                 .setTitle("All active queues")
                 queuesEmbed.setDescription(`${queues.length} Active queues`)
-                queues.forEach((s, i) => {
+                queues.forEach((q, i) => {
                     console.log(queues[i][1])
-                    queuesEmbed.addField(`${i+1}`, `${s[1].serverName}`)
+                    queuesEmbed.addField(`${i+1}`, `${q[1].serverName}`)
                 })
+
+                // No command arguments, send embed
                 if(args.length < 2) return message.channel.send(queuesEmbed)
-                console.log(args.length)
+
                 if(args.length == 2){
-                    queueSchema.find({server: queues[parseInt(args[1]-1)][1].server}, (err, res) => {
+                    queueSchema.find({
+                        server: queues[parseInt(args[1]-1)][1].server
+                    }, (err, res) => {
                         let queueInfo = new Discord.MessageEmbed()
                         .setColor("#ff0000")
                         .setTitle(`${queues[parseInt(args[1])-1][1].serverName}`)
-                        res.forEach((x,i) => {
-                            queueInfo.addField(`Player ${i+1}`, x.username)
+                        res.forEach((r,i) => {
+                            queueInfo.addField(`Player ${i+1}`, r.username)
                         })
                         message.channel.send(queueInfo)
                     })   
